@@ -66,7 +66,7 @@ module Fluent
         topic = @topic_generator.call(tag, record)
         topic = topic.gsub(/\./, '-') if topic # SNS doesn't allow .
         if @topics[topic]
-          @topics[topic].publish(record.to_json, :subject => subject )
+          @topics[topic].publish(record.to_json, subject: subject)
         else
           $log.error "Could not find topic '#{topic}' on SNS"
         end
