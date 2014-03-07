@@ -27,7 +27,7 @@ Fluent output plugin to send messages to Amazon SNS.
   ## 2) Map fluent tags
   ## sns.App.MyTopic -> 'App-MyTopic'
   topic_map_tag true
-  remove_tag_prefix 'sns'
+  remove_tag_prefix sns
 
   ## 3) Map fluent message key
   ## maps 'topic' key in the message
