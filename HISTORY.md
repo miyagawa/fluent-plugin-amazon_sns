@@ -1,3 +1,7 @@
+### 0.0.4
+
+- Specify aws-sdk-v1 gem (mirakui)
+
 ### 0.0.3
 
 - Fix bad config syntax in README
