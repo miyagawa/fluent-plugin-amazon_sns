@@ -66,7 +66,8 @@ module Fluent
         topic = @topic_generator.call(tag, record)
         topic = topic.gsub(/\./, '-') if topic # SNS doesn't allow .
         if @topics[topic]
-          @topics[topic].publish(record.to_json, subject: subject)
+          message = Yajl::Encoder.encode(record).encode("UTF-8", :invalid => :replace, :undef => :replace)
+          @topics[topic].publish(message, subject: subject)
         else
           $log.error "Could not find topic '#{topic}' on SNS"
         end

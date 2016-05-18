@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Tatsuhiko Miyagawa"]
   spec.email         = ["miyagawa@bulknews.net"]
   spec.summary       = %q{Fluent output plugin to send to Amazon SNS}
-  spec.description   = %q{}
-  spec.homepage      = ""
+  spec.description   = %q{Fluent output plugin to send to Amazon SNS}
+  spec.homepage      = "https://github.com/miyagawa/fluent-plugin-amazon_sns"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
@@ -20,7 +20,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "fluentd", "~> 0.10.0"
   spec.add_dependency "aws-sdk-v1", "~> 1.12"
+  spec.add_dependency "yajl-ruby", "~> 1.0"
 
   spec.add_development_dependency "bundler", "~> 1.5"
-  spec.add_development_dependency "rake"
+  spec.add_development_dependency "rake", "~> 0"
 end
