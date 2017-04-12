@@ -1,3 +1,7 @@
+### 0.0.5
+
+- relax fluentd dependency (makimoto)
+
 ### 0.0.4
 
 - Specify aws-sdk-v1 gem (mirakui)
