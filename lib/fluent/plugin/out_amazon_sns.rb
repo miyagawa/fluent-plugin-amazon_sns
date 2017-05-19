@@ -11,7 +11,7 @@ module Fluent
     config_set_default :include_time_key, true
 
     config_param :aws_access_key_id, :string, default: nil
-    config_param :aws_secret_access_key, :string, default: nil
+    config_param :aws_secret_access_key, :string, default: nil, secret: true
     config_param :aws_region, :string, default: nil
     config_param :aws_proxy_uri, :string, default: ENV['HTTP_PROXY']
 
