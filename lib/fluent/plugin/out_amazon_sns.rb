@@ -1,13 +1,15 @@
 require "aws-sdk"
+require "fluent/plugin/output"
 
-module Fluent
-  class AmazonSNSOutput < BufferedOutput
+module Fluent::Plugin
+  class AmazonSNSOutput < Output
     Fluent::Plugin.register_output('amazon_sns', self)
 
-    include SetTagKeyMixin
-    config_set_default :include_tag_key, false
+    helpers :compat_parameters, :inject
 
-    include SetTimeKeyMixin
+    DEFAULT_BUFFER_TYPE = "memory"
+
+    config_set_default :include_tag_key, false
     config_set_default :include_time_key, true
 
     config_param :aws_access_key_id, :string, default: nil
@@ -23,7 +25,12 @@ module Fluent
     config_param :remove_tag_prefix, :string, default: nil
     config_param :topic_map_key, :string, default: nil
 
+    config_section :buffer do
+      config_set_default :@type, DEFAULT_BUFFER_TYPE
+    end
+
     def configure(conf)
+      compat_parameters_convert(conf, :buffer, :inject)
       super
 
       @topic_generator = case
@@ -57,7 +64,16 @@ module Fluent
     end
 
     def format(tag, time, record)
+      record = inject_values_to_record(tag, time, record)
       [tag, time, record].to_msgpack
+    end
+
+    def formatted_to_msgpack_binary?
+      true
+    end
+
+    def multi_workers_ready?
+      true
     end
 
     def write(chunk)
