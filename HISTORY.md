@@ -1,3 +1,8 @@
+### 0.0.6
+
+- Mark `aws_secret_access_key` parameter as secret (cosmo0920)
+- Upgrade aws-sdk to v2 (kaorimatz)
+
 ### 0.0.5
 
 - relax fluentd dependency (makimoto)
