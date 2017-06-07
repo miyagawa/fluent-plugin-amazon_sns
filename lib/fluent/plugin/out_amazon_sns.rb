@@ -1,4 +1,4 @@
-require "aws-sdk-v1"
+require "aws-sdk"
 
 module Fluent
   class AmazonSNSOutput < BufferedOutput
@@ -12,7 +12,7 @@ module Fluent
 
     config_param :aws_access_key_id, :string, default: nil
     config_param :aws_secret_access_key, :string, default: nil, secret: true
-    config_param :aws_region, :string, default: nil
+    config_param :aws_region, :string, default: ENV['AWS_REGION'] || ENV['AWS_DEFAULT_REGION'] || 'us-east-1'
     config_param :aws_proxy_uri, :string, default: ENV['HTTP_PROXY']
 
     config_param :subject_key, :string, default: nil
@@ -36,18 +36,19 @@ module Fluent
                          else
                            raise Fluent::ConfigError, "no one way specified to decide target"
                          end
-
-      options = {}
-      [:access_key_id, :secret_access_key, :region, :proxy_uri].each do |key|
-        options[key] = instance_variable_get "@aws_#{key}"
-      end
-
-      AWS.config(options)
     end
 
     def start
       super
-      @sns = AWS::SNS.new
+
+      options = {}
+      [:access_key_id, :secret_access_key, :region].each do |key|
+        options[key] = instance_variable_get "@aws_#{key}"
+      end
+      options[:http_proxy] = @aws_proxy_uri
+
+      sns_client = Aws::SNS::Client.new(options)
+      @sns = Aws::SNS::Resource.new(client: sns_client)
       @topics = get_topics
     end
 
@@ -66,16 +67,16 @@ module Fluent
         topic = @topic_generator.call(tag, record)
         topic = topic.gsub(/\./, '-') if topic # SNS doesn't allow .
         if @topics[topic]
-          @topics[topic].publish(record.to_json, subject: subject)
+          @topics[topic].publish(message: record.to_json, subject: subject)
         else
           $log.error "Could not find topic '#{topic}' on SNS"
         end
       end
     end
 
-    def get_topics()
+    def get_topics
       @sns.topics.inject({}) do |product, topic|
-        product[topic.name] = topic
+        product[topic.arn.split(/:/).last] = topic
         product
       end
     end
