@@ -1,3 +1,7 @@
+### 0.0.7
+
+- Use modularized aws-sdk (moriyoshi)
+
 ### 0.0.6
 
 - Mark `aws_secret_access_key` parameter as secret (cosmo0920)
