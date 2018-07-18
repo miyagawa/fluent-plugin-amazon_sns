@@ -22,6 +22,7 @@ module Fluent
     config_param :topic_map_tag, :bool, default: false
     config_param :remove_tag_prefix, :string, default: nil
     config_param :topic_map_key, :string, default: nil
+    config_param :add_time_key, :bool, default: false
 
     def configure(conf)
       super
@@ -62,7 +63,9 @@ module Fluent
 
     def write(chunk)
       chunk.msgpack_each do |tag, time, record|
-        record["time"] = Time.at(time).localtime
+        if @add_time_key
+          record["time"] = Time.at(time).localtime
+        end
         subject = record.delete(@subject_key) || @subject  || 'Fluent-Notification'
         topic = @topic_generator.call(tag, record)
         topic = topic.gsub(/\./, '-') if topic # SNS doesn't allow .
