@@ -1,4 +1,4 @@
-require "aws-sdk-sns"
+require "aws-sdk"
 
 module Fluent
   class AmazonSNSOutput < BufferedOutput
