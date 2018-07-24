@@ -1,4 +1,4 @@
-require "aws-sdk-sns"
+require "aws-sdk"
 
 module Fluent
   class AmazonSNSOutput < BufferedOutput
@@ -22,6 +22,9 @@ module Fluent
     config_param :topic_map_tag, :bool, default: false
     config_param :remove_tag_prefix, :string, default: nil
     config_param :topic_map_key, :string, default: nil
+    config_param :sns_message_attributes, :hash, :default => nil
+    config_param :sns_message_attributes_keys, :hash, :default => nil
+    config_param :add_time_key, :bool, default: false
 
     def configure(conf)
       super
@@ -62,12 +65,17 @@ module Fluent
 
     def write(chunk)
       chunk.msgpack_each do |tag, time, record|
-        record["time"] = Time.at(time).localtime
+        if @add_time_key
+          record["time"] = Time.at(time).localtime
+        end
+        message_attributes = get_message_attributes(record)
         subject = record.delete(@subject_key) || @subject  || 'Fluent-Notification'
         topic = @topic_generator.call(tag, record)
         topic = topic.gsub(/\./, '-') if topic # SNS doesn't allow .
         if @topics[topic]
-          @topics[topic].publish(message: record.to_json, subject: subject)
+          @topics[topic].publish( message: record.to_json,
+                                  subject: subject, 
+                                  message_attributes: message_attributes )
         else
           $log.error "Could not find topic '#{topic}' on SNS"
         end
@@ -79,6 +87,30 @@ module Fluent
         product[topic.arn.split(/:/).last] = topic
         product
       end
+    end
+
+    def get_message_attributes(record)
+      message_attributes = {}
+
+      if @sns_message_attributes_keys
+        @sns_message_attributes_keys.each_pair do |attribute, key|
+          value = record[key]
+          if value
+            message_attributes[attribute] = {
+              data_type: "String",
+              string_value: value,
+            }
+          end
+        end
+      elsif @sns_message_attributes
+        @sns_message_attributes.each_pair do |attribute, value|
+          message_attributes[attribute] = {
+            data_type: "String",
+            string_value: value,
+          }
+        end
+      end
+      return message_attributes
     end
   end
 end
