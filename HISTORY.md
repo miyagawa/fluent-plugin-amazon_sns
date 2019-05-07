@@ -1,3 +1,7 @@
+### 0.0.8
+
+- Relax fluentd dependency (kaorimatz)
+
 ### 0.0.7
 
 - Use modularized aws-sdk (moriyoshi)
