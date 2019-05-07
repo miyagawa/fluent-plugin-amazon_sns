@@ -2,6 +2,13 @@
 
 Fluent output plugin to send messages to Amazon SNS.
 
+## Requirements
+
+| fluent-plugin-amazon_sns | Fluentd     | Ruby   |
+|--------------------------|------------ |--------|
+| >= 0.1.0                 | >= v0.14.15 | >= 2.1 |
+| < 0.1.0                  | >= v0.10.0  | >= 1.9 |
+
 ## Installation
 
     gem install fluent-plugin-amazon_sns

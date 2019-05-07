@@ -1,3 +1,7 @@
+### 0.1.0
+
+- Migrate to v0.14 API (cosmo0920)
+
 ### 0.0.8
 
 - Relax fluentd dependency (kaorimatz)
