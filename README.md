@@ -21,6 +21,9 @@ Fluent output plugin to send messages to Amazon SNS.
 
   flush_interval 1s
 
+  # Optional add a {time} attribute to the record at the time of emit
+  add_time_key true
+
   # Optional if you have AWS_* environment variables set up (via IAM Role etc.)
   aws_access_key_id AWS_ACCESS_KEY_ID
   aws_secret_access_key AWS_SECRET_ACCESS_KEY
