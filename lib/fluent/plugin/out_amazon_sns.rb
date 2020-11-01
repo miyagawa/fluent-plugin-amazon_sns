@@ -1,5 +1,6 @@
 require "aws-sdk-sns"
 require "fluent/plugin/output"
+require "fluent/httpcallbackpluginextension"
 
 module Fluent::Plugin
   class AmazonSNSOutput < Output
@@ -24,6 +25,10 @@ module Fluent::Plugin
     config_param :topic_map_tag, :bool, default: false
     config_param :remove_tag_prefix, :string, default: nil
     config_param :topic_map_key, :string, default: nil
+
+    config_param :oncompletionevent, :string, default: nil 
+    config_param :oncompletionevent_isHttp2, :bool, default: false
+    config_param :oncompletionevent_mimeType, :string, default: 'text/plain'
 
     config_section :buffer do
       config_set_default :@type, DEFAULT_BUFFER_TYPE
@@ -83,12 +88,20 @@ module Fluent::Plugin
         topic = @topic_generator.call(tag, record)
         topic = topic.gsub(/\./, '-') if topic # SNS doesn't allow .
         if @topics[topic]
-          @topics[topic].publish(message: record.to_json, subject: subject)
+          response = @topics[topic].publish(message: record.to_json, subject: subject)
+          do_callback(response)
         else
           $log.error "Could not find topic '#{topic}' on SNS"
         end
       end
     end
+
+    def do_callback(response)
+     if !response.nil? && !@oncompletionevent.nil? 
+        oncompleteEventHdlr = Fluent::HttpCallbackPluginExtension.new
+        oncompleteEventHdlr.dohttpcallback(@oncompletionevent,response,@oncompletionevent_isHttp2,@oncompletionevent_mimeType)
+     end
+    end 
 
     def get_topics
       @sns.topics.inject({}) do |product, topic|
