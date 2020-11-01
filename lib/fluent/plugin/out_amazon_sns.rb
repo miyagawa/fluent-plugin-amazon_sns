@@ -99,7 +99,7 @@ module Fluent::Plugin
     def do_callback(response,callbackurl)
      if !response.nil? && !@oncompletionevent.nil? 
         oncompleteEventHdlr = Fluent::HttpCallbackPluginExtension.new
-        oncompleteEventHdlr.dohttpcallback(@oncompletionevent,response,oncompletionevent_isHttp2,@oncompletionevent_mimeType)
+        oncompleteEventHdlr.dohttpcallback(@oncompletionevent,response,@oncompletionevent_isHttp2,@oncompletionevent_mimeType)
      end
     end 
 
