@@ -89,14 +89,14 @@ module Fluent::Plugin
         topic = topic.gsub(/\./, '-') if topic # SNS doesn't allow .
         if @topics[topic]
           response = @topics[topic].publish(message: record.to_json, subject: subject)
-          do_callback(@oncompletionevent,response,@oncompletionevent_isHttp2,@oncompletionevent_mimeType)
+          do_callback(response)
         else
           $log.error "Could not find topic '#{topic}' on SNS"
         end
       end
     end
 
-    def do_callback(response,callbackurl)
+    def do_callback(response)
      if !response.nil? && !@oncompletionevent.nil? 
         oncompleteEventHdlr = Fluent::HttpCallbackPluginExtension.new
         oncompleteEventHdlr.dohttpcallback(@oncompletionevent,response,@oncompletionevent_isHttp2,@oncompletionevent_mimeType)
